@@ -1,0 +1,107 @@
+.detail {
+  flex: 1;
+  overflow-y: scroll;
+  scrollbar-color: rgb(17, 25, 40) rgba(70, 97, 147, 0.5);
+
+  .user {
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #dddddd35;
+
+    img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+
+  .info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .option {
+    .title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      img {
+        width: 30px;
+        height: 30px;
+        background-color: rgba(17, 25, 40, 0.3);
+        border-radius: 50%;
+        padding: 10px;
+        cursor: pointer;
+      }
+    }
+
+    .photos {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      gap: 20px;
+
+      .photoItem {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 15px;
+
+        .photoDetail {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 10px;
+          }
+
+          span {
+            font-weight: 300;
+            font-size: 14px;
+            color: lightgray;
+          }
+        }
+        img {
+          width: 30px;
+        }
+      }
+    }
+  }
+  button {
+    padding: 10px 20px;
+    background-color: rgba(230, 74, 105, 0.553);
+    color: white;
+    border-radius: 10px;
+    border: none;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgb(230, 20, 60, 0.796);
+      transition: ease-in-out;
+    }
+
+    &.logout {
+      padding: 10px;
+      background-color: #1a73e8;
+      transition: ease-in-out;
+
+      &:hover {
+        background-color: #529dff;
+        transition: ease-in-out;
+      }
+    }
+  }
+}
