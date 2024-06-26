@@ -4,6 +4,7 @@ import AddUser from "./addUser/AddUser";
 import { useUserStore } from "../../../lib/userStore";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
+import { useChatStore } from "../../../lib/chatStore";
 
 // This component renders the chat list of the current user.
 // It fetches the chat data from the Firestore database and displays it in the UI.
@@ -14,6 +15,7 @@ const ChatList = () => {
 
   // Get the current user from the user store.
   const { currentUser } = useUserStore();
+  const { chatId, changeChat } = useChatStore();
 
   // Fetch the chat data from Firestore when the component mounts or when the current user changes.
   useEffect(() => {
@@ -44,6 +46,10 @@ const ChatList = () => {
     return () => unSub();
   }, [currentUser.id]);
 
+  const handleSelect = async (chat) => {
+    changeChat(chat.chatId, chat.user);
+  };
+
   // Render the chat list UI.
   return (
     <div className="chatList">
@@ -64,8 +70,12 @@ const ChatList = () => {
 
       {/* Render each chat item */}
       {chats.map((chat) => (
-        <div key={chat.chatId} className="item">
-          <img src="/avatar.png" alt="" />
+        <div
+          key={chat.chatId}
+          className="item"
+          onClick={() => handleSelect(chat)}
+        >
+          <img src={chat.user.avatar || "/avatar.png"} alt="" />
           <div className="texts">
             <span>{chat.user.username}</span>
             <p>{chat.lastMessage}</p>
