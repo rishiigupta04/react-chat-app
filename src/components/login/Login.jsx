@@ -16,12 +16,14 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../../lib/firebase";
 import upload from "../../lib/upload";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [avatar, setAvatar] = useState({
     file: null,
     url: "",
   });
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
 
@@ -43,6 +45,7 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast.success("Logged in successfully");
+      navigate("/dashboard");
     } catch (error) {
       toast.error(error.message);
       console.log(error);
