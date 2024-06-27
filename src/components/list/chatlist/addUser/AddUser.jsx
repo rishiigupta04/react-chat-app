@@ -71,6 +71,8 @@ const AddUser = () => {
           updatedAt: Date.now(),
         }),
       });
+      setUser(user);
+      toast.success("User added successfully");
     } catch (error) {
       console.log(error);
       toast.error(error.message);
@@ -88,13 +90,16 @@ const AddUser = () => {
         />
         <button>Search</button>
       </form>
+
       {user && (
         <div className="user">
           <div className="detail">
             <img src={user.avatar} alt="" />
             <span>{user.username}</span>
           </div>
-          <button onClick={handleAdd}>Add User</button>
+          <button onClick={handleAdd} onclick="style.display = 'none'">
+            Add User
+          </button>
         </div>
       )}
     </div>
