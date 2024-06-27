@@ -2,6 +2,7 @@
   flex: 2;
   border-left: 1px solid #dddddd35;
   border-right: 1px solid #dddddd35;
+  height: 100%;
   display: flex;
   flex-direction: column;
 
@@ -64,21 +65,12 @@
     .message {
       max-width: 70%;
       display: flex;
-      align-items: center;
       gap: 20px;
 
       &.own {
         align-self: flex-end;
-        flex-direction: row-reverse;
 
         .texts {
-          img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 10px;
-          }
-
           p {
             background-color: #5183fe;
           }
@@ -86,28 +78,32 @@
       }
 
       img {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
         object-fit: cover;
       }
-
       .texts {
         flex: 1;
         display: flex;
         flex-direction: column;
         gap: 5px;
 
-        p {
-          padding: 10px 15px;
+        img {
+          width: 100%;
+          height: 300px;
           border-radius: 10px;
-          max-width: max-content;
+          object-fit: cover;
+        }
+
+        p {
+          padding: 20px;
           background-color: rgba(17, 25, 40, 0.3);
+          border-radius: 10px;
         }
 
         span {
-          font-size: 12px;
-          color: #dadadac2;
+          font-size: 13px;
         }
       }
     }
@@ -145,6 +141,10 @@
       border-radius: 10px;
       padding: 15px 10px;
       font-size: 20px;
+
+      &:disabled {
+        cursor: not-allowed;
+      }
     }
 
     .emoji {
@@ -178,6 +178,16 @@
       cursor: pointer;
       outline: none;
       border: none;
+
+      &:hover {
+        background-color: #529dff;
+        transition: ease-in-out;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     }
   }
 }

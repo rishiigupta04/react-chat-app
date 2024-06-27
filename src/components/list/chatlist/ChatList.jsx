@@ -12,6 +12,7 @@ const ChatList = () => {
   // State variables to store the chat data and the add mode.
   const [chats, setChats] = useState([]);
   const [addMode, setAddMode] = useState(false);
+  const [input, setInput] = useState("");
 
   // Get the current user from the user store.
   const { currentUser } = useUserStore();
@@ -70,6 +71,10 @@ const ChatList = () => {
     }
   };
 
+  const filteredChats = chats.filter((c) =>
+    c.user.username.toLowerCase().includes(input.toLowerCase())
+  );
+
   // Render the chat list UI.
   return (
     <div className="chatList">
@@ -77,7 +82,13 @@ const ChatList = () => {
       <div className="search">
         <div className="searchBar">
           <img src="/search.png" alt="" />
-          <input type="text" name="" id="" placeholder="Search" />
+          <input
+            type="text"
+            name=""
+            id=""
+            placeholder="Search"
+            onChange={(e) => setInput(e.target.value)}
+          />
         </div>
         {/* Toggle add mode button */}
         <img
@@ -89,7 +100,7 @@ const ChatList = () => {
       </div>
 
       {/* Render each chat item */}
-      {chats.map((chat) => (
+      {filteredChats.map((chat) => (
         <div
           key={chat.chatId}
           className="item"
@@ -98,9 +109,20 @@ const ChatList = () => {
             backgroundColor: chat?.isSeen ? "transparent" : "#5183fe",
           }}
         >
-          <img src={chat.user.avatar || "/avatar.png"} alt="" />
+          <img
+            src={
+              chat.user.blocked.includes(currentUser.id)
+                ? "/avatar.png"
+                : chat.user.avatar || "/avatar.png"
+            }
+            alt=""
+          />
           <div className="texts">
-            <span>{chat.user.username}</span>
+            <span>
+              {chat.user.blocked.includes(currentUser.id)
+                ? "User"
+                : chat.user.username}
+            </span>
             <p>{chat.lastMessage}</p>
           </div>
         </div>

@@ -1,16 +1,50 @@
 import React, { useState } from "react";
 import "./detail.css";
-import { auth } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase";
 import { toast } from "react-toastify";
+import { useChatStore } from "../../lib/chatStore";
+import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { useUserStore } from "../../lib/userStore";
 
 const Detail = () => {
   const [isBlocked, setIsBlocked] = useState(false);
+
+  const { chatId, user, isCurrentUserBlocked, isReceiverBlocked, changeBlock } =
+    useChatStore();
+
+  const { currentUser } = useUserStore();
+
+  const handleBlock = async () => {
+    if (!user) return;
+
+    const userDocRef = doc(db, "users", currentUser.id);
+
+    try {
+      await updateDoc(userDocRef, {
+        blocked: isReceiverBlocked ? arrayRemove(user.id) : arrayUnion(user.id),
+      });
+      changeBlock();
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+
+  const handleLogout = () => {
+    toast.success("Logged out successfully!");
+    auth.signOut();
+    resetChat();
+  };
   return (
     <div className="detail">
       <div className="user">
-        <img src="/avatar.png" alt="" />
-        <h2>John Doe</h2>
-        <p>Lorem, ipsum dolor sit amet consectetur.</p>
+        <img src={user?.avatar || "/avatar.png"} alt="" />
+        <h2>
+          {isReceiverBlocked || isCurrentUserBlocked
+            ? "User (Blocked)"
+            : user?.username}
+        </h2>
+        <p>Hey, I'm new to this platform!</p>
       </div>
       <div className="info">
         <div className="option">
@@ -41,46 +75,6 @@ const Detail = () => {
               </div>
               <img src="/download.png" alt="" />
             </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img
-                  src="https://image.cnbcfm.com/api/v1/image/101074162-breaking-bad_r.jpg?v=1497619874&w=1920&h=1080"
-                  alt=""
-                />
-                <span>photo_2024.png</span>
-              </div>
-              <img src="/download.png" alt="" />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img
-                  src="https://image.cnbcfm.com/api/v1/image/101074162-breaking-bad_r.jpg?v=1497619874&w=1920&h=1080"
-                  alt=""
-                />
-                <span>photo_2024.png</span>
-              </div>
-              <img src="/download.png" alt="" />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img
-                  src="https://image.cnbcfm.com/api/v1/image/101074162-breaking-bad_r.jpg?v=1497619874&w=1920&h=1080"
-                  alt=""
-                />
-                <span>photo_2024.png</span>
-              </div>
-              <img src="/download.png" alt="" />
-            </div>
-            <div className="photoItem">
-              <div className="photoDetail">
-                <img
-                  src="https://image.cnbcfm.com/api/v1/image/101074162-breaking-bad_r.jpg?v=1497619874&w=1920&h=1080"
-                  alt=""
-                />
-                <span>photo_2024.png</span>
-              </div>
-              <img src="/download.png" alt="" />
-            </div>
           </div>
         </div>
         <div className="option">
@@ -89,22 +83,14 @@ const Detail = () => {
             <img src="/arrowUp.png" alt="" />
           </div>
         </div>
-        <button
-          onClick={() => {
-            isBlocked
-              ? toast.success("User Unblocked!")
-              : toast.error("User Blocked!");
-            setIsBlocked(!isBlocked);
-          }}
-        >
-          {!isBlocked ? "Block User" : "Unblock User"}
+        <button onClick={handleBlock}>
+          {isCurrentUserBlocked
+            ? "You are Blocked!"
+            : isReceiverBlocked
+            ? "User Blocked"
+            : "Block User"}
         </button>
-        <button
-          onClick={() => {
-            auth.signOut(), toast.warn("Logged out!");
-          }}
-          className="logout"
-        >
+        <button onClick={handleLogout} className="logout">
           Logout
         </button>
       </div>

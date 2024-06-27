@@ -22,7 +22,8 @@ const Chat = () => {
     url: "",
   });
 
-  const { chatId, user } = useChatStore();
+  const { chatId, user, isReceiverBlocked, isCurrentUserBlocked } =
+    useChatStore();
   const { currentUser } = useUserStore();
 
   const endRef = useRef(null);
@@ -110,10 +111,14 @@ const Chat = () => {
     <div className="chat">
       <div className="top">
         <div className="user">
-          <img src="/avatar.png" alt="" />
+          <img src={user?.avatar || "/avatar.png"} alt="" />
           <div className="texts">
-            <span>John Doe</span>
-            <p>Lorem ipsum dolor sit amet consectetur.</p>
+            <span>
+              {isReceiverBlocked || isCurrentUserBlocked
+                ? "User (Blocked)"
+                : user?.username}
+            </span>
+            <p>Hey, I'm new to this platform!</p>
           </div>
         </div>
         <div className="icons">
@@ -157,29 +162,36 @@ const Chat = () => {
       </div>
 
       <div className="bottom">
-        <div className="icons">
-          <label htmlFor="file">
-            <img src="/img.png" alt="" />
-          </label>
-          <input
-            type="file"
-            name=""
-            id="file"
-            style={{
-              display: "none",
-            }}
-            onChange={handleImg}
-          />
-          <img src="/camera.png" alt="" />
-          <img src="/mic.png" alt="" />
-        </div>
+        {!(isCurrentUserBlocked || isReceiverBlocked) && (
+          <div className="icons">
+            <label htmlFor="file">
+              <img src="/img.png" alt="" />
+            </label>
+            <input
+              type="file"
+              name=""
+              id="file"
+              style={{
+                display: "none",
+              }}
+              onChange={handleImg}
+            />
+            <img src="/camera.png" alt="" />
+            <img src="/mic.png" alt="" />
+          </div>
+        )}
         <input
           onChange={(e) => setText(e.target.value)}
           type="text"
           value={text}
           name=""
           id=""
-          placeholder="Type a message..."
+          placeholder={
+            isCurrentUserBlocked || isReceiverBlocked
+              ? "Can't message a blocked user"
+              : "Type a message..."
+          }
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
         />
 
         <div className="emoji">
@@ -190,7 +202,11 @@ const Chat = () => {
           </div>
         </div>
 
-        <button onClick={handleSend} className="sendButton">
+        <button
+          disabled={isCurrentUserBlocked || isReceiverBlocked}
+          onClick={handleSend}
+          className="sendButton"
+        >
           Send
         </button>
       </div>
