@@ -8,49 +8,34 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
 import { useChatStore } from "./lib/chatStore";
-import { Route, Routes, useNavigate } from "react-router-dom";
 
 const App = () => {
   const { currentUser, isLoading, fetchUserInfo } = useUserStore();
   const { chatId } = useChatStore();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchUserInfo(user?.uid);
-        navigate("/dashboard");
-      } else {
-        navigate("/login");
-      }
+      fetchUserInfo(user?.uid);
     });
 
-    return () => unSub();
-  }, [fetchUserInfo, navigate]);
+    return () => {
+      unSub();
+    };
+  }, [fetchUserInfo]);
 
-  if (isLoading) {
-    return <div className="loading">Loading...</div>;
-  }
+  if (isLoading) return <div className="loading">Loading...</div>;
 
   return (
-    <div className="container" style={{ overflow: "hidden" }}>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            currentUser ? (
-              <>
-                <List />
-                {chatId && <Chat />}
-                {chatId && <Detail />}
-              </>
-            ) : (
-              <Login />
-            )
-          }
-        />
-      </Routes>
+    <div className="container">
+      {currentUser ? (
+        <>
+          <List />
+          {chatId && <Chat />}
+          {chatId && <Detail />}
+        </>
+      ) : (
+        <Login />
+      )}
       <Notification />
     </div>
   );
