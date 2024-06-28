@@ -42,7 +42,7 @@ const Login = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Logged in successfully");
+      toast.success("Success! Refresh to Login");
     } catch (error) {
       toast.error(error.message);
       console.log(error);
@@ -100,7 +100,7 @@ const Login = () => {
         chats: [],
       });
 
-      toast.success("Account created successfully");
+      toast.success("Account created successfully! Please Login");
       e.target.reset();
     } catch (err) {
       toast.error(err.message);
