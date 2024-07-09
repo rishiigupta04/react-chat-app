@@ -189,5 +189,26 @@
         cursor: not-allowed;
       }
     }
+    .preview {
+      position: relative;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .preview img {
+      width: 100px;
+      height: 50px;
+      object-fit: cover;
+    }
+
+    .preview button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
   }
 }

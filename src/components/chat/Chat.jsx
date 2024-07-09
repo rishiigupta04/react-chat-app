@@ -21,6 +21,7 @@ const Chat = () => {
     file: null,
     url: "",
   });
+  const [isSending, setIsSending] = useState(false);
 
   const { chatId, user, isReceiverBlocked, isCurrentUserBlocked } =
     useChatStore();
@@ -29,8 +30,9 @@ const Chat = () => {
   const endRef = useRef(null);
 
   const handleSend = async () => {
-    if (text === "") return;
+    if ((text === "" && !img.file) || isSending) return;
 
+    setIsSending(true);
     let imgUrl = null;
 
     try {
@@ -48,41 +50,45 @@ const Chat = () => {
 
       const userIDs = [currentUser.id, user.id];
 
-      userIDs.forEach(async (id) => {
-        const userChatRef = doc(db, "userchats", id);
-        const userChatsSnapshot = await getDoc(userChatRef);
+      await Promise.all(
+        userIDs.map(async (id) => {
+          const userChatRef = doc(db, "userchats", id);
+          const userChatsSnapshot = await getDoc(userChatRef);
 
-        if (userChatsSnapshot.exists()) {
-          const userChatsData = userChatsSnapshot.data();
+          if (userChatsSnapshot.exists()) {
+            const userChatsData = userChatsSnapshot.data();
 
-          const chatIndex = userChatsData.chats.findIndex(
-            (chat) => chat.chatId === chatId
-          );
+            const chatIndex = userChatsData.chats.findIndex(
+              (chat) => chat.chatId === chatId
+            );
 
-          userChatsData.chats[chatIndex].lastMessage = text;
-          userChatsData.chats[chatIndex].isSeen =
-            id === currentUser.id ? true : false;
-          userChatsData.chats[chatIndex].updatedAt = Date.now();
+            userChatsData.chats[chatIndex].lastMessage = text || "Image sent";
+            userChatsData.chats[chatIndex].isSeen =
+              id === currentUser.id ? true : false;
+            userChatsData.chats[chatIndex].updatedAt = Date.now();
 
-          await updateDoc(userChatRef, {
-            chats: userChatsData.chats,
-          });
-        }
-      });
+            await updateDoc(userChatRef, {
+              chats: userChatsData.chats,
+            });
+          }
+        })
+      );
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    } finally {
+      setIsSending(false);
+      setImg({
+        file: null,
+        url: "",
+      });
+      setText("");
     }
-    setImg({
-      file: null,
-      url: "",
-    });
-    setText("");
   };
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  }, [chat]);
 
   useEffect(() => {
     const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
@@ -107,6 +113,14 @@ const Chat = () => {
       });
     }
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
   return (
     <div className="chat">
       <div className="top">
@@ -143,21 +157,6 @@ const Chat = () => {
             </div>
           </div>
         ))}
-        {img.url && (
-          <div className="message own">
-            <div className="texts">
-              <img src={img.url} alt="" />
-            </div>
-          </div>
-        )}
-
-        {img.url && (
-          <div className="message">
-            <div className="texts">
-              <img src={img.url} alt="" />
-            </div>
-          </div>
-        )}
         <div ref={endRef}></div>
       </div>
 
@@ -182,6 +181,7 @@ const Chat = () => {
         )}
         <input
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
           type="text"
           value={text}
           name=""
@@ -191,7 +191,7 @@ const Chat = () => {
               ? "Can't message a blocked user"
               : "Type a message..."
           }
-          disabled={isCurrentUserBlocked || isReceiverBlocked}
+          disabled={isCurrentUserBlocked || isReceiverBlocked || isSending}
         />
 
         <div className="emoji">
@@ -202,8 +202,15 @@ const Chat = () => {
           </div>
         </div>
 
+        {img.url && (
+          <div className="preview">
+            <img src={img.url} alt="Preview" />
+            <button onClick={() => setImg({ file: null, url: "" })}>X</button>
+          </div>
+        )}
+
         <button
-          disabled={isCurrentUserBlocked || isReceiverBlocked}
+          disabled={isCurrentUserBlocked || isReceiverBlocked || isSending}
           onClick={handleSend}
           className="sendButton"
         >
